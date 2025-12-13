@@ -2,14 +2,17 @@ import pygame
 #from scripts.astroid import Asteroid
 from .ship import Ship
 from .direction import Direction
+from .asteroid import Asteroid
 
 class Game:
     def __init__(self, screen_size, screen_colour):
         self.screen_size = screen_size
         self.screen_colour = screen_colour
         self.player = Ship(50, 50)
+        self.asteroids = [Asteroid(500, 500, -0.5, -0.5), Asteroid(500, 100, 1, 0.25)]
         # list of object to render
         self.render_items = [self.player]
+        self.render_items.append(self.asteroids)
 
     def game_init(self):
         pygame.init()
@@ -36,11 +39,17 @@ class Game:
                 self.player.accelerate_ship(Direction.BACKWARD)
 
             self.player.update()
+            for asteroid in self.asteroids:
+                asteroid.update()
 
             # render
             self.screen.fill(self.screen_colour)
-            player_rect = self.rectangle = pygame.Rect(self.player.pos.x, self.player.pos.y, 50, 100)
-            pygame.draw.rect(self.screen, "white", player_rect)
+            
+            pygame.draw.polygon(self.screen, "white", self.player.get_polygon_points())
+
+            for asteroid in self.asteroids:
+                rect = pygame.Rect(asteroid.pos.x, asteroid.pos.y, 75, 75)
+                pygame.draw.rect(self.screen, "brown", rect)
 
             # update display
             pygame.display.flip()

@@ -25,7 +25,9 @@ class Ship(Renderable):
         self.vel.add_vector2d(self.accel)
         self.pos.add_vector2d(self.vel)
 
-        print("x: ", self.pos.x, " y: ", self.pos.y)
+        # reset acceleration now we've applied it to velocity
+        self.accel.x = 0
+        self.accel.y = 0
 
         if self.pos.x >= SCREEN_WIDTH:
             self.pos.x = 0
@@ -37,12 +39,15 @@ class Ship(Renderable):
             self.pos.y = SCREEN_HEIGHT
 
     def calculate_acceleration(self, delta_a):
-        # TODO: implement properly
-        if self.vel.magnitude() <= MAX_VELOCITY:
-            return Vector2D(0, ACCEL_RATE)
-        else:
-            return Vector2D(0,0)
+        return Vector2D(0, ACCEL_RATE)
     
+
+    def get_polygon_points(self):
+        front = (self.pos.x, self.pos.y + SHIP_LENGTH / 2)
+        aft_port = (self.pos.x - (SHIP_WIDTH / 2), self.pos.y - (SHIP_LENGTH / 2))
+        aft_starboard = (self.pos.x + (SHIP_WIDTH / 2), self.pos.y - (SHIP_LENGTH /2))
+        
+        return [front, aft_port, aft_starboard]
 
 
     def accelerate_ship(self, direction):
@@ -50,7 +55,8 @@ class Ship(Renderable):
 
         match direction:
             case Direction.FORWARD:
-                self.accel.add_vector2d(acceleration)
+                self.accel = acceleration
             case Direction.BACKWARD:
-                self.accel.subtract_vector2d(acceleration)
+                acceleration.reverse()
+                self.accel = acceleration
                 

@@ -15,3 +15,7 @@ class Vector2D:
 
     def magnitude(self):
         return math.sqrt((self.x  * self.x) + (self.y * self.y))
+    
+    def reverse(self):
+        self.x = -self.x
+        self.y = -self.y
