@@ -6,14 +6,13 @@ from .ship_constants import *
 from .game_constants import *
 
 class Ship(Renderable):
-    # inital vectors for the ship
-    vel = Vector2D(0,0)
-    accel = Vector2D(0,0)
-    rot_vel = 0
-    rot_accel = 0
-
     def __init__(self, start_x, start_y):
         super().__init__()
+        
+        # inital vectors for the ship
+        self.vel = Vector2D(0,0)
+        self.accel = Vector2D(0,0)
+        self.rot_vel = 0
 
         # x,y coordinates on the map
         self.pos = Vector2D(start_x, start_y)
@@ -26,12 +25,8 @@ class Ship(Renderable):
         
 
     def update(self):
-        self.vel.add_vector2d(self.accel)
         self.pos.add_vector2d(self.vel)
-
-        # reset acceleration now we've applied it to velocity
-        self.accel.x = 0
-        self.accel.y = 0
+        self.heading += self.rot_vel
 
         if self.pos.x >= SCREEN_WIDTH:
             self.pos.x = 0
@@ -43,8 +38,13 @@ class Ship(Renderable):
             self.pos.y = SCREEN_HEIGHT
             
 
-    def calculate_acceleration(self, delta_a):
-        return Vector2D(0, ACCEL_RATE)
+    def calculate_acceleration(self):
+        angle_radians = math.radians(90 - self.heading)
+
+        accel_x = ACCEL_RATE * math.cos(angle_radians)
+        accel_y = ACCEL_RATE * math.sin(angle_radians)
+
+        return Vector2D(accel_x, -accel_y)
     
     
     def rotate_point(self, point_x, point_y, center_x, center_y, angle_radians):
@@ -69,20 +69,18 @@ class Ship(Renderable):
 
 
     def accelerate_ship(self, direction):
-        acceleration = self.calculate_acceleration(ACCEL_RATE)
+        acceleration = self.calculate_acceleration()
 
         match direction:
             case Direction.FORWARD:
-                self.accel = acceleration
+                self.vel.add_vector2d(acceleration)
             case Direction.BACKWARD:
-                acceleration.reverse()
-                self.accel = acceleration
+                self.vel.subtract_vector2d(acceleration)
             case Direction.LEFT:
                 pass
             case Direction.RIGHT:
                 pass
             case Direction.CLOCKWISE:
-                self.heading += MAX_ROTATIONAL_VELOCITY
+                self.rot_vel += ROTATIONAL_ACCEL_RATE
             case Direction.ANTI_CLOCKWISE:
-                self.heading -= MAX_ROTATIONAL_VELOCITY
-                
+                self.rot_vel -= ROTATIONAL_ACCEL_RATE
