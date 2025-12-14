@@ -46,6 +46,12 @@ class Ship(Renderable):
 
         return Vector2D(accel_x, -accel_y)
     
+
+    def get_front_point(self):
+        angle_radians = math.radians(self.heading)
+        front_point = self.rotate_point(self.front.x, self.front.y, self.pos.x, self.pos.y, angle_radians)
+        return Vector2D(front_point[0], front_point[1])
+    
     
     def rotate_point(self, point_x, point_y, center_x, center_y, angle_radians):
         # rotate the points
