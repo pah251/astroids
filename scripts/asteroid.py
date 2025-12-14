@@ -55,4 +55,15 @@ class Asteroid(Renderable):
 
 
     def check_collision(self, projectiles):
-        pass
+        for asteroid_part in self.asteroid_parts:
+            for projectile in projectiles:
+                if asteroid_part.rect.colliderect(projectile.rect):
+                    projectiles.remove(projectile)
+                    if asteroid_part.critical_part:
+                        return True
+                    else:
+                        self.asteroid_parts.remove(asteroid_part)
+                        return False
+                    
+        
+        

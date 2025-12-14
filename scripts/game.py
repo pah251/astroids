@@ -63,6 +63,7 @@ class Game:
                         
             self.projectile_controller.update_projectiles(dt)
 
+            self.asteroid_controller.check_collisions(self.projectile_controller.projectiles)
             
             # handle rendering
             self.screen.fill(self.screen_colour)
