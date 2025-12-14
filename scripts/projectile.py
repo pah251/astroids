@@ -6,6 +6,8 @@ import math
 
 class Projectile(Renderable):
     def __init__(self, x_pos, y_pos, heading):
+        super().__init__()
+
         self.pos = Vector2D(x_pos, y_pos)
         self.heading = heading
         self.vel = self.calculate_velocity(heading)
@@ -26,6 +28,5 @@ class Projectile(Renderable):
 
         # check for going off the screen -> if so return false so the game controller knows to stop drawing it
         if self.pos.x < 0 or self.pos.x > SCREEN_WIDTH or self.pos.y < 0 or self.pos.y > SCREEN_HEIGHT:
-            print("off screen!")
             return False
         return True

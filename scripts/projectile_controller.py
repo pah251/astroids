@@ -8,7 +8,6 @@ class ProjectileController:
     
     def spawn_projectile(self, x_pos, y_pos, heading):
         if self.cooldown <= 0:
-            print("spawning new projectile at ", x_pos, ", ", y_pos)
             new_projectile = Projectile(x_pos, y_pos, heading)
             self.projectiles.append(new_projectile)
             self.cooldown = COOLDOWN_SECONDS
