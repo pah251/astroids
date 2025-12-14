@@ -15,7 +15,7 @@ class ProjectileController:
 
     
     def update_projectiles(self, time_elapsed):
-        self.cooldown -= time_elapsed
+        self.cooldown -= time_elapsed / 1000
 
         for projectile in self.projectiles:
             update = projectile.update()
