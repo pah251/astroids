@@ -22,6 +22,9 @@ class Ship(Renderable):
         self.front = Vector2D(0, -SHIP_LENGTH / 2)
         self.aft_port = Vector2D(SHIP_WIDTH / 2, SHIP_LENGTH / 2)
         self.aft_starboard = Vector2D(-SHIP_WIDTH / 2, SHIP_LENGTH / 2)
+
+        # define the imaginary radius for crude collision detection
+        self.radius = SHIP_LENGTH / 2
         
 
     def update(self):
@@ -90,3 +93,13 @@ class Ship(Renderable):
                 self.rot_vel += ROTATIONAL_ACCEL_RATE
             case Direction.ANTI_CLOCKWISE:
                 self.rot_vel -= ROTATIONAL_ACCEL_RATE
+
+
+    def check_collision(self, asteroids):
+        ship_points = self.get_polygon_points()
+        for asteroid in asteroids:
+            for asteroid_part in asteroid.asteroid_parts:
+                for x, y in ship_points:
+                    if asteroid_part.rect.collidepoint(x, y):
+                        return True
+        
