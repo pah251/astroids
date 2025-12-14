@@ -5,3 +5,5 @@ class Direction(Enum):
     LEFT = auto()
     RIGHT = auto()
     BACKWARD = auto()
+    CLOCKWISE = auto()
+    ANTI_CLOCKWISE = auto()

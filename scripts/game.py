@@ -33,10 +33,18 @@ class Game:
             # updates
             keys = pygame.key.get_pressed()
 
-            if keys[pygame.K_UP]:
+            if keys[pygame.K_w]:
                 self.player.accelerate_ship(Direction.FORWARD)
-            if keys[pygame.K_DOWN]:
+            if keys[pygame.K_s]:
                 self.player.accelerate_ship(Direction.BACKWARD)
+            if keys[pygame.K_q]:
+                self.player.accelerate_ship(Direction.LEFT)
+            if keys[pygame.K_e]:
+                self.player.accelerate_ship(Direction.RIGHT)
+            if keys[pygame.K_d]:
+                self.player.accelerate_ship(Direction.CLOCKWISE)
+            if keys[pygame.K_a]:
+                self.player.accelerate_ship(Direction.ANTI_CLOCKWISE)
 
             self.player.update()
             for asteroid in self.asteroids:
@@ -46,6 +54,7 @@ class Game:
             self.screen.fill(self.screen_colour)
             
             pygame.draw.polygon(self.screen, "white", self.player.get_polygon_points())
+            pygame.draw.circle(self.screen, "green", (self.player.pos.x, self.player.pos.y), 2)
 
             for asteroid in self.asteroids:
                 rect = pygame.Rect(asteroid.pos.x, asteroid.pos.y, 75, 75)
