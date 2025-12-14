@@ -29,7 +29,7 @@ class AsteroidController:
         asteroid_spawn_vel_x = random.randrange(-MAX_X_VELOCITY, MAX_X_VELOCITY)
         asteroid_spawn_vel_y = random.randrange(-MAX_Y_VELOCITY, MAX_Y_VELOCITY)
 
-        num_asteroid_parts = random.randint(0, MAX_ASTEROID_PARTS)
+        num_asteroid_parts = random.randint(1, MAX_ASTEROID_PARTS)
 
         new_asteroid = Asteroid(
             asteroid_spawn_pos_x, asteroid_spawn_pos_y,

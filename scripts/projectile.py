@@ -1,3 +1,4 @@
+from pygame import Rect
 from .renderable import Renderable
 from .vector2d import Vector2D
 from .projectile_constants import *
@@ -11,7 +12,7 @@ class Projectile(Renderable):
         self.pos = Vector2D(x_pos, y_pos)
         self.heading = heading
         self.vel = self.calculate_velocity(heading)
-        
+        self.rect = Rect(x_pos, y_pos, PROJECTILE_SIZE, PROJECTILE_SIZE)
 
     def calculate_velocity(self, heading):
         angle_radians = math.radians(90 - heading)
@@ -25,6 +26,9 @@ class Projectile(Renderable):
 
     def update(self):
         self.pos.add_vector2d(self.vel)
+
+        self.rect.centerx = self.pos.x
+        self.rect.centery = self.pos.y
 
         # check for going off the screen -> if so return false so the game controller knows to stop drawing it
         if self.pos.x < 0 or self.pos.x > SCREEN_WIDTH or self.pos.y < 0 or self.pos.y > SCREEN_HEIGHT:

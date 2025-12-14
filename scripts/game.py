@@ -36,7 +36,7 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
-                
+            
             # handle player input
             keys = pygame.key.get_pressed()
 
@@ -73,17 +73,11 @@ class Game:
 
             # draw the asteroids
             for asteroid in self.asteroid_controller.asteroids:
-                asteroid_rect = pygame.Rect(asteroid.pos.x, asteroid.pos.y, asteroid.width, asteroid.height)
-                pygame.draw.rect(self.screen, "brown", asteroid_rect)
                 for asteroid_part in asteroid.asteroid_parts:
-                    asteroid_part_rect = pygame.Rect(
-                        asteroid.pos.x + asteroid_part.core_offset.x, asteroid.pos.y + asteroid_part.core_offset.y,
-                        asteroid_part.width, asteroid_part.height
-                    )
-                    pygame.draw.rect(self.screen, "purple", asteroid_part_rect)
+                    pygame.draw.rect(self.screen, asteroid_part.colour, asteroid_part.rect)
 
             for projectile in self.projectile_controller.projectiles:
-                pygame.draw.circle(self.screen, PROJECTILE_COLOUR, (projectile.pos.x, projectile.pos.y), PROJECTILE_RADIUS)
+                pygame.draw.rect(self.screen, PROJECTILE_COLOUR, projectile.rect)
 
             # update display
             pygame.display.flip()
