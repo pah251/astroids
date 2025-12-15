@@ -47,7 +47,13 @@ class AsteroidController:
 
 
     def check_collisions(self, projectiles):
+        num_collisions = 0
         for asteroid in self.asteroids:
             destroy = asteroid.check_collision(projectiles)
             if destroy == True:
                 self.asteroids.remove(asteroid)
+                
+                # increment the number of collisions for the score
+                num_collisions += 1
+
+        return num_collisions

@@ -12,29 +12,57 @@ class Game:
     def __init__(self, screen_size, screen_colour):
         self.screen_size = screen_size
         self.screen_colour = screen_colour
+        self.game_state = GameState.MAIN_MENU
+        self.hi_score = 0
+        self.score = 0
 
 
     def pygame_init(self):
         pygame.init()
         self.font = pygame.font.Font(None, size=40)
+        self.screen = pygame.display.set_mode(self.screen_size)
 
 
     def game_init(self):
+        # create player entity
         self.player = Ship(STARTING_X_POS, STARTING_Y_POS)
+
+        # controllers for game entities
         self.asteroid_controller = AsteroidController()
         self.projectile_controller = ProjectileController()
-        self.player.pos.x = STARTING_X_POS
-        self.player.pos.y = STARTING_Y_POS
-        self.screen = pygame.display.set_mode(self.screen_size)
-        self.asteroid_controller.spawn_asteroid()
-        self.asteroid_controller.spawn_asteroid()
-        self.asteroid_controller.spawn_asteroid()
+
+        # spawn asteroids
+        for i in range (STARTING_ASTEROIDS):
+            self.asteroid_controller.spawn_asteroid()
+
+        # select appropriate game state
         self.game_state = GameState.ASTEROIDS_GAME
 
+        # initalise both the timer and the cooldown to be the initial value
+        self.asteroid_spawn_timer = INITIAL_ASTEROID_SPAWN_COOLDOWN
+        self.asteroid_spawn_cooldown = INITIAL_ASTEROID_SPAWN_COOLDOWN
+        
+        # counter for score
+        self.score = 0
 
 
     def main_menu(self):
-        pass
+        self.screen.fill(self.screen_colour)
+
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_SPACE]:
+            self.game_init()
+            return GameState.ASTEROIDS_GAME
+        
+        game_over_text = self.font.render('ASTROIDS', True, (255,255,255))
+        self.screen.blit(game_over_text, (SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 - 25))        
+        continue_text = self.font.render('Press space to play!', True, (255, 255, 255))
+        self.screen.blit(continue_text, (SCREEN_WIDTH/2 - 175, SCREEN_HEIGHT/2 + 25))
+
+        pygame.display.flip()
+
+        return GameState.MAIN_MENU
+
 
 
     def game_over(self):
@@ -48,7 +76,14 @@ class Game:
         game_over_text = self.font.render('GAME OVER', True, (255,255,255))
         continue_text = self.font.render('Press space to play again...', True, (255, 255, 255))
         self.screen.blit(game_over_text, (SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 - 25))
-        self.screen.blit(continue_text, (SCREEN_WIDTH/2 - 175, SCREEN_HEIGHT/2 + 25))
+        if self.score > self.hi_score:
+            score_text = self.font.render(f"NEW HIGH SCORE: {self.score}", True, (255,255,255))
+            self.screen.blit(score_text, (SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 + 25))
+            self.hi_score = self.score
+        else:
+            score_text = self.font.render(f"SCORE: {self.score}", True, (255,255,255))
+            self.screen.blit(score_text, (SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 + 25))
+        self.screen.blit(continue_text, (SCREEN_WIDTH/2 - 175, SCREEN_HEIGHT/2 + 125))
         pygame.display.flip()
         return GameState.ASTEROIDS_GAME_OVER
         
@@ -81,10 +116,16 @@ class Game:
                     
         self.projectile_controller.update_projectiles(dt)
 
+        # if cooldown has elapsed, spawn a new asteroid
+        
+
+        # check for collisions between player and astroids
+        # end the game if so
         game_over = self.player.check_collision(self.asteroid_controller.asteroids)
         if game_over == True:
             return GameState.ASTEROIDS_GAME_OVER
-        self.asteroid_controller.check_collisions(self.projectile_controller.projectiles)
+        
+        self.score += self.asteroid_controller.check_collisions(self.projectile_controller.projectiles)
         
         # handle rendering
         self.screen.fill(self.screen_colour)
@@ -117,7 +158,9 @@ class Game:
                 if event.type == pygame.QUIT:
                     self.game_quit()
 
-            if self.game_state == GameState.ASTEROIDS_GAME:
+            if self.game_state == GameState.MAIN_MENU:
+                self.game_state = self.main_menu()
+            elif self.game_state == GameState.ASTEROIDS_GAME:
                 self.game_state = self.asteroids_game(dt)
             elif self.game_state == GameState.ASTEROIDS_GAME_OVER:
                 self.game_state = self.game_over()
