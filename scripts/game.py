@@ -75,14 +75,15 @@ class Game:
         
         game_over_text = self.font.render('GAME OVER', True, (255,255,255))
         continue_text = self.font.render('Press space to play again...', True, (255, 255, 255))
-        self.screen.blit(game_over_text, (SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 - 25))
+
         if self.score > self.hi_score:
-            score_text = self.font.render(f"NEW HIGH SCORE: {self.score}", True, (255,255,255))
-            self.screen.blit(score_text, (SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 + 25))
+            score_text = self.font.render(f"NEW HIGH SCORE: {self.score}", True, (255,255,255))    
             self.hi_score = self.score
         else:
             score_text = self.font.render(f"SCORE: {self.score}", True, (255,255,255))
-            self.screen.blit(score_text, (SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 + 25))
+        
+        self.screen.blit(game_over_text, (SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 - 25))
+        self.screen.blit(score_text, (SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 + 25))
         self.screen.blit(continue_text, (SCREEN_WIDTH/2 - 175, SCREEN_HEIGHT/2 + 125))
         pygame.display.flip()
         return GameState.ASTEROIDS_GAME_OVER
@@ -111,13 +112,21 @@ class Game:
 
         # update the game state
         self.player.update()
-
-        self.asteroid_controller.update_asteroids()
-                    
+        self.asteroid_controller.update_asteroids()                    
         self.projectile_controller.update_projectiles(dt)
 
         # if cooldown has elapsed, spawn a new asteroid
-        
+        if self.asteroid_spawn_timer <= 0:
+            self.asteroid_controller.spawn_asteroid()
+
+            # reset the timer
+            self.asteroid_spawn_timer = self.asteroid_spawn_cooldown
+
+            # ramp up difficulty by reducing cooldown
+            if self.asteroid_spawn_cooldown >= MIN_ASTEROID_SPAWN_COOLDOWN:
+                self.asteroid_spawn_cooldown -= 1
+        else:
+            self.asteroid_spawn_timer -= dt / 1000
 
         # check for collisions between player and astroids
         # end the game if so
@@ -125,6 +134,8 @@ class Game:
         if game_over == True:
             return GameState.ASTEROIDS_GAME_OVER
         
+        # check for collisions between projectiles and asteroids
+        # increment score if destroyed asteroid core
         self.score += self.asteroid_controller.check_collisions(self.projectile_controller.projectiles)
         
         # handle rendering
@@ -139,9 +150,13 @@ class Game:
         for asteroid in self.asteroid_controller.asteroids:
             for asteroid_part in asteroid.asteroid_parts:
                 pygame.draw.rect(self.screen, asteroid_part.colour, asteroid_part.rect)
-
+        # draw projectiles
         for projectile in self.projectile_controller.projectiles:
             pygame.draw.rect(self.screen, PROJECTILE_COLOUR, projectile.rect)
+
+        # draw counter for score
+        score_text = self.font.render(f"SCORE: {self.score}", True, (255,255,255))
+        self.screen.blit(score_text, (10, 10))
 
         # update display
         pygame.display.flip()
