@@ -5,7 +5,9 @@ from .direction import Direction
 from .game_state import GameState
 from .projectile_controller import ProjectileController
 from .asteroid_controller import AsteroidController
+from .background_animation import BackgroundAnimation
 from .projectile_constants import *
+from .animation_constants import *
 from .game_constants import *
 
 class Game:
@@ -15,7 +17,7 @@ class Game:
         self.game_state = GameState.MAIN_MENU
         self.hi_score = 0
         self.score = 0
-
+        self.background_animation = BackgroundAnimation()
 
     def pygame_init(self):
         pygame.init()
@@ -64,7 +66,6 @@ class Game:
         return GameState.MAIN_MENU
 
 
-
     def game_over(self):
         self.screen.fill(self.screen_colour)
 
@@ -88,7 +89,6 @@ class Game:
         pygame.display.flip()
         return GameState.ASTEROIDS_GAME_OVER
         
-
 
     def asteroids_game(self, dt):        
         # handle player input
@@ -114,6 +114,7 @@ class Game:
         self.player.update()
         self.asteroid_controller.update_asteroids()                    
         self.projectile_controller.update_projectiles(dt)
+        self.background_animation.update()
 
         # if cooldown has elapsed, spawn a new asteroid
         if self.asteroid_spawn_timer <= 0:
@@ -140,16 +141,22 @@ class Game:
         
         # handle rendering
         self.screen.fill(self.screen_colour)
+
+        # draw the background
+        for background_layer in self.background_animation.background_layers:
+            for background_object in background_layer:
+                self.screen.set_at((background_object.x, background_object.y), BACKGROUND_STAR_COLOUR)
+                #pygame.draw.line(self.screen, "white", (background_object.x, background_object.y), (background_object.x, background_object.y))
         
         # draw the player's ship
-        pygame.draw.polygon(self.screen, "white", self.player.get_polygon_points())
+        pygame.draw.polygon(self.screen, "white", self.player.get_polygon_points(), 2)
         ship_front = self.player.get_front_point()
         pygame.draw.circle(self.screen, "green", (ship_front.x, ship_front.y), 1)
 
         # draw the asteroids
         for asteroid in self.asteroid_controller.asteroids:
             for asteroid_part in asteroid.asteroid_parts:
-                pygame.draw.rect(self.screen, asteroid_part.colour, asteroid_part.rect)
+                pygame.draw.rect(self.screen, asteroid_part.colour, asteroid_part.rect, 1)
         # draw projectiles
         for projectile in self.projectile_controller.projectiles:
             pygame.draw.rect(self.screen, PROJECTILE_COLOUR, projectile.rect)
@@ -180,11 +187,8 @@ class Game:
             elif self.game_state == GameState.ASTEROIDS_GAME_OVER:
                 self.game_state = self.game_over()
             
-
         self.game_quit()
     
     def game_quit(self):
         pygame.quit()
         quit()
-
-    
