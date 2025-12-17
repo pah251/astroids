@@ -2,12 +2,14 @@ from .renderable import Renderable
 from .direction import Direction
 from .vector2d import Vector2D
 import math
+import pygame
 from .ship_constants import *
 from .game_constants import *
 
 class Ship(Renderable):
     def __init__(self, start_x, start_y):
         super().__init__()
+        pygame.init()
         
         # inital vectors for the ship
         self.vel = Vector2D(0,0)
@@ -103,3 +105,8 @@ class Ship(Renderable):
                     if asteroid_part.rect.collidepoint(x, y):
                         return True
         
+
+    def draw(self, screen):
+        ship_front = self.get_front_point()
+        pygame.draw.polygon(screen, "white", self.get_polygon_points(), 2)
+        pygame.draw.circle(screen, "green", (ship_front.x, ship_front.y), 1)

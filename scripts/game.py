@@ -39,10 +39,6 @@ class Game:
 
         # select appropriate game state
         self.game_state = GameState.ASTEROIDS_GAME
-
-        # initalise both the timer and the cooldown to be the initial value
-        self.asteroid_spawn_timer = INITIAL_ASTEROID_SPAWN_COOLDOWN
-        self.asteroid_spawn_cooldown = INITIAL_ASTEROID_SPAWN_COOLDOWN
         
         # counter for score
         self.score = 0
@@ -112,22 +108,9 @@ class Game:
 
         # update the game state
         self.player.update()
-        self.asteroid_controller.update_asteroids()                    
-        self.projectile_controller.update_projectiles(dt)
+        self.asteroid_controller.update(dt)                    
+        self.projectile_controller.update(dt)
         self.background_animation.update()
-
-        # if cooldown has elapsed, spawn a new asteroid
-        if self.asteroid_spawn_timer <= 0:
-            self.asteroid_controller.spawn_asteroid()
-
-            # reset the timer
-            self.asteroid_spawn_timer = self.asteroid_spawn_cooldown
-
-            # ramp up difficulty by reducing cooldown
-            if self.asteroid_spawn_cooldown >= MIN_ASTEROID_SPAWN_COOLDOWN:
-                self.asteroid_spawn_cooldown -= 1
-        else:
-            self.asteroid_spawn_timer -= dt / 1000
 
         # check for collisions between player and astroids
         # end the game if so
@@ -143,23 +126,16 @@ class Game:
         self.screen.fill(self.screen_colour)
 
         # draw the background
-        for background_layer in self.background_animation.background_layers:
-            for background_object in background_layer:
-                self.screen.set_at((background_object.x, background_object.y), BACKGROUND_STAR_COLOUR)
-                #pygame.draw.line(self.screen, "white", (background_object.x, background_object.y), (background_object.x, background_object.y))
+        self.background_animation.draw(self.screen)
         
         # draw the player's ship
-        pygame.draw.polygon(self.screen, "white", self.player.get_polygon_points(), 2)
-        ship_front = self.player.get_front_point()
-        pygame.draw.circle(self.screen, "green", (ship_front.x, ship_front.y), 1)
+        self.player.draw(self.screen)
 
         # draw the asteroids
-        for asteroid in self.asteroid_controller.asteroids:
-            for asteroid_part in asteroid.asteroid_parts:
-                pygame.draw.rect(self.screen, asteroid_part.colour, asteroid_part.rect, 1)
+        self.asteroid_controller.draw(self.screen)
         # draw projectiles
-        for projectile in self.projectile_controller.projectiles:
-            pygame.draw.rect(self.screen, PROJECTILE_COLOUR, projectile.rect)
+        self.projectile_controller.draw(self.screen)
+            
 
         # draw counter for score
         score_text = self.font.render(f"SCORE: {self.score}", True, (255,255,255))

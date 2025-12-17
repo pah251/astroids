@@ -1,15 +1,16 @@
 from .vector2d import Vector2D
-from pygame import Rect
+import pygame
 from .game_constants import *
 
 class AsteroidPart:
     def __init__(self, pos_x, pos_y, vel_x, vel_y, height, width, critical_part):
+        pygame.init()
         self.pos = Vector2D(pos_x, pos_y)
         self.vel = Vector2D(vel_x, vel_y)
         self.width = width
         self.height = height
 
-        self.rect = Rect(pos_x, pos_y, width, height)
+        self.rect = pygame.Rect(pos_x, pos_y, width, height)
 
         self.critical_part = critical_part
         if critical_part:
@@ -32,3 +33,6 @@ class AsteroidPart:
         self.rect.centerx = self.pos.x
         self.rect.centery = self.pos.y
 
+
+    def draw(self, screen):
+        pygame.draw.rect(screen, self.colour, self.rect, 1)

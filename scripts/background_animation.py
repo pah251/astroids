@@ -30,3 +30,9 @@ class BackgroundAnimation:
             # increment the offset to move the next layer by a further amount
             # gives the illusion of speed
             x_offset += BACKGROUND_ANIMATION_LAYER_SPEED_DELTA
+
+
+    def draw(self, screen):
+        for background_layer in self.background_layers:
+            for background_object in background_layer:
+                screen.set_at((background_object.x, background_object.y), BACKGROUND_STAR_COLOUR)

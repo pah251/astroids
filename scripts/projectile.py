@@ -1,4 +1,4 @@
-from pygame import Rect
+import pygame
 from .renderable import Renderable
 from .vector2d import Vector2D
 from .projectile_constants import *
@@ -7,12 +7,13 @@ import math
 
 class Projectile(Renderable):
     def __init__(self, x_pos, y_pos, heading):
+        pygame.init()
         super().__init__()
 
         self.pos = Vector2D(x_pos, y_pos)
         self.heading = heading
         self.vel = self.calculate_velocity(heading)
-        self.rect = Rect(x_pos, y_pos, PROJECTILE_SIZE, PROJECTILE_SIZE)
+        self.rect = pygame.Rect(x_pos, y_pos, PROJECTILE_SIZE, PROJECTILE_SIZE)
 
     def calculate_velocity(self, heading):
         angle_radians = math.radians(90 - heading)
@@ -34,3 +35,7 @@ class Projectile(Renderable):
         if self.pos.x < 0 or self.pos.x > SCREEN_WIDTH or self.pos.y < 0 or self.pos.y > SCREEN_HEIGHT:
             return False
         return True
+    
+
+    def draw(self, screen):
+        pygame.draw.rect(screen, PROJECTILE_COLOUR, self.rect)

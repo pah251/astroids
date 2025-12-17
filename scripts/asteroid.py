@@ -65,5 +65,9 @@ class Asteroid(Renderable):
                         self.asteroid_parts.remove(asteroid_part)
                         return False
                     
+
+    def draw(self, screen):
+        for asteroid_part in self.asteroid_parts:
+            asteroid_part.draw(screen)
         
         

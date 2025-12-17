@@ -6,6 +6,9 @@ import random
 class AsteroidController:
     def __init__(self):
         self.asteroids = []
+        # initalise both the timer and the cooldown to be the initial value
+        self.asteroid_spawn_timer = INITIAL_ASTEROID_SPAWN_COOLDOWN
+        self.asteroid_spawn_cooldown = INITIAL_ASTEROID_SPAWN_COOLDOWN
 
 
     def spawn_asteroid(self):
@@ -41,9 +44,23 @@ class AsteroidController:
         self.asteroids.append(new_asteroid)
 
 
-    def update_asteroids(self):
+    def update(self, dt):
+                # if cooldown has elapsed, spawn a new asteroid
+        if self.asteroid_spawn_timer <= 0:
+            self.spawn_asteroid()
+
+            # reset the timer
+            self.asteroid_spawn_timer = self.asteroid_spawn_cooldown
+
+            # ramp up difficulty by reducing cooldown
+            if self.asteroid_spawn_cooldown >= MIN_ASTEROID_SPAWN_COOLDOWN:
+                self.asteroid_spawn_cooldown -= 1
+        else:
+            self.asteroid_spawn_timer -= dt / 1000
+
         for asteroid in self.asteroids:
             asteroid.update()
+
 
 
     def check_collisions(self, projectiles):
@@ -57,3 +74,8 @@ class AsteroidController:
                 num_collisions += 1
 
         return num_collisions
+
+
+    def draw(self, screen):
+        for asteroid in self.asteroids:
+            asteroid.draw(screen)

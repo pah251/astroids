@@ -6,6 +6,7 @@ class ProjectileController:
         self.projectiles = []
         self.cooldown = 0
     
+
     def spawn_projectile(self, x_pos, y_pos, heading):
         if self.cooldown <= 0:
             new_projectile = Projectile(x_pos, y_pos, heading)
@@ -13,7 +14,7 @@ class ProjectileController:
             self.cooldown = COOLDOWN_SECONDS
 
     
-    def update_projectiles(self, time_elapsed):
+    def update(self, time_elapsed):
         self.cooldown -= time_elapsed / 1000
 
         for projectile in self.projectiles:
@@ -22,4 +23,6 @@ class ProjectileController:
                self.projectiles.remove(projectile)
 
 
-
+    def draw(self, screen):
+        for projectile in self.projectiles:
+            projectile.draw(screen)
