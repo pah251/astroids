@@ -68,6 +68,14 @@ class Ship(Renderable):
         #return (x_rotated, y_rotated)
     
 
+    def get_basic_shape_translated(self, x, y):
+        a = (self.front.x + x, self.front.y + y)
+        b = (self.aft_starboard.x + x, self.aft_starboard.y + y)
+        c = (self.aft_port.x + x, self.aft_port.y + y)
+
+        return (a, b, c)
+
+
     def get_polygon_points(self):
         # convert heading to radians for rotating
         angle_radians = math.radians(self.heading)

@@ -18,6 +18,7 @@ class Game:
         self.hi_score = 0
         self.score = 0
         self.background_animation = BackgroundAnimation()
+        self.remaining_lives = STARTING_LIVES
 
     def pygame_init(self):
         pygame.init()
@@ -26,6 +27,19 @@ class Game:
 
 
     def game_init(self):
+        self.reset_game_state()
+
+        # select appropriate game state
+        self.game_state = GameState.ASTEROIDS_GAME
+        
+        # counter for score
+        self.score = 0
+
+        # reset lives
+        self.remaining_lives = STARTING_LIVES
+
+
+    def reset_game_state(self):
         # create player entity
         self.player = Ship(STARTING_X_POS, STARTING_Y_POS)
 
@@ -36,12 +50,6 @@ class Game:
         # spawn asteroids
         for i in range (STARTING_ASTEROIDS):
             self.asteroid_controller.spawn_asteroid()
-
-        # select appropriate game state
-        self.game_state = GameState.ASTEROIDS_GAME
-        
-        # counter for score
-        self.score = 0
 
 
     def main_menu(self):
@@ -114,8 +122,10 @@ class Game:
 
         # check for collisions between player and astroids
         # end the game if so
-        game_over = self.player.check_collision(self.asteroid_controller.asteroids)
-        if game_over == True:
+        if self.player.check_collision(self.asteroid_controller.asteroids):
+            self.remaining_lives -= 1
+            self.reset_game_state()
+        if self.remaining_lives <= 0:
             return GameState.ASTEROIDS_GAME_OVER
         
         # check for collisions between projectiles and asteroids
@@ -136,10 +146,18 @@ class Game:
         # draw projectiles
         self.projectile_controller.draw(self.screen)
             
-
         # draw counter for score
         score_text = self.font.render(f"SCORE: {self.score}", True, (255,255,255))
         self.screen.blit(score_text, (10, 10))
+
+        # draw remaining lives
+        lives_text = self.font.render("LIVES: ", True, (255,255,255))
+        self.screen.blit(lives_text, (10, SCREEN_HEIGHT - 40))
+        x_draw_offset = 115
+        y_draw_offset = SCREEN_HEIGHT - 30
+        for i in range (self.remaining_lives):
+            pygame.draw.polygon(self.screen, "white", self.player.get_basic_shape_translated(x_draw_offset, y_draw_offset), 2)
+            x_draw_offset += 25
 
         # update display
         pygame.display.flip()
