@@ -52,13 +52,8 @@ class Game:
             self.asteroid_controller.spawn_asteroid()
 
 
-    def main_menu(self):
+    def render_main_menu(self):
         self.screen.fill(self.screen_colour)
-
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE]:
-            self.game_init()
-            return GameState.ASTEROIDS_GAME
         
         game_over_text = self.font.render('ASTROIDS', True, (255,255,255))
         self.screen.blit(game_over_text, (SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 - 25))        
@@ -70,13 +65,8 @@ class Game:
         return GameState.MAIN_MENU
 
 
-    def game_over(self):
+    def render_game_over_screen(self):
         self.screen.fill(self.screen_colour)
-
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE]:
-            self.game_init()
-            return GameState.ASTEROIDS_GAME
         
         game_over_text = self.font.render('GAME OVER', True, (255,255,255))
         continue_text = self.font.render('Press space to play again...', True, (255, 255, 255))
@@ -93,6 +83,19 @@ class Game:
         pygame.display.flip()
         return GameState.ASTEROIDS_GAME_OVER
         
+
+    def render_pause_menu(self):        
+        paused_text = self.font.render("GAME PAUSED\nPress [esc] to continue...", True, (255,255,255))  
+
+        self.screen.fill(self.screen_colour)
+        self.background_animation.draw(self.screen)
+        self.screen.blit(paused_text, (SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 - 25))
+      
+        pygame.display.flip()
+
+        return GameState.ASTEROIDS_GAME_PAUSED
+
+
 
     def asteroids_game(self, dt):        
         # handle player input
@@ -170,16 +173,38 @@ class Game:
         running = True
         while running:
             dt = clock.tick(FPS)
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.game_quit()
+                if event.type == pygame.KEYDOWN:
+                    # Esc --> pausing logic
+                    if event.key == pygame.K_ESCAPE:
+                        # pause game
+                        if self.game_state == GameState.ASTEROIDS_GAME:
+                            self.game_state = GameState.ASTEROIDS_GAME_PAUSED
+                        # resume game
+                        elif self.game_state == GameState.ASTEROIDS_GAME_PAUSED:
+                            self.game_state = GameState.ASTEROIDS_GAME
+                    # Space --> starting game               
+                    if event.key == pygame.K_SPACE:
+                        if self.game_state == GameState.MAIN_MENU:
+                            self.game_init()
+                            self.game_state = GameState.ASTEROIDS_GAME 
+                        elif self.game_state == GameState.ASTEROIDS_GAME_OVER:
+                            self.game_init()
+                            self.game_state = GameState.ASTEROIDS_GAME
+                            
 
             if self.game_state == GameState.MAIN_MENU:
-                self.game_state = self.main_menu()
+                self.render_main_menu()
             elif self.game_state == GameState.ASTEROIDS_GAME:
+                # main game loop, get the new game state depending on events within the game
                 self.game_state = self.asteroids_game(dt)
             elif self.game_state == GameState.ASTEROIDS_GAME_OVER:
-                self.game_state = self.game_over()
+                self.render_game_over_screen()
+            elif self.game_state == GameState.ASTEROIDS_GAME_PAUSED:
+                self.render_pause_menu()
             
         self.game_quit()
     
